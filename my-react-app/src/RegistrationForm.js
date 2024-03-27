@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./RegistrationForm.css"; // Import CSS for styling
+import "./RegistrationForm.css";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -13,8 +13,31 @@ const RegistrationForm = () => {
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
+  const handleClear = () => {
+    setFormData({
+      full_name: "",
+      contact_number: "",
+      email: "",
+      date_of_birth: "",
+      password: "",
+      confirm_password: "",
+    });
+  };
+  const handleCancle = () => {
+    handleClear();
+    setSuccessMessage("");
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "contact_number" && !/^\d*$/.test(value)) {
+      setErrors({
+        ...errors,
+        [name]: "Contact number must contain only numbers",
+      });
+      return;
+    }
+
     setFormData({
       ...formData,
       [name]: value,
@@ -42,11 +65,11 @@ const RegistrationForm = () => {
         .then((data) => {
           console.log(data);
           setSuccessMessage("User account successfully created.");
+          handleClear();
         })
         .catch((error) =>
           console.error("There was an error creating the account.", error)
         );
-      setSuccessMessage("User account successfully created.");
     }
   };
 
@@ -58,10 +81,7 @@ const RegistrationForm = () => {
       errors.full_name = "Full name is required";
     }
 
-    if (
-      !formData.contact_number.trim() ||
-      formData.contact_number.length < 10
-    ) {
+    if (!formData.contact_number.trim()) {
       errors.contact_number = "Contact number is required";
     }
 
@@ -186,7 +206,7 @@ const RegistrationForm = () => {
           )}
         </div>
         <div className="buttons">
-          <button type="button" className="btn-cencel">
+          <button type="button" className="btn-cencel" onClick={handleCancle}>
             Cancel
           </button>
           <button type="submit" className="btn-register">
